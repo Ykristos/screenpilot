@@ -30,7 +30,7 @@ class QwenVL(GroundingModel):
         coord_space: str = "resized",  # resized | normalized_1000 | original
         max_pixels: int = 1280 * 28 * 28,
         max_new_tokens: int = 64,
-        adapter: str | None = None,  # path to a LoRA adapter after week 3
+        adapter: str | None = None,
         **_,
     ):
         self.name = model_id.split("/")[-1] + (f"+{adapter}" if adapter else "")
