@@ -66,7 +66,7 @@ def iter_screenspot_v2(annotation_dir: str | Path, image_dir: str | Path) -> Ite
             x, y, w, h = r["bbox"]
             yield Example(
                 id=f"{platform}-{i}",
-                image=str(image_dir / r["img_filename"]),
+                image=str((image_dir / r["img_filename"]).resolve()),
                 instruction=r["instruction"],
                 bbox=(x, y, x + w, y + h),
                 platform=platform,

@@ -30,6 +30,9 @@ def main():
     args = ap.parse_args()
 
     examples = list(iter_screenspot_v2(args.annotations, args.images))
+    missing = [ex for ex in examples if not Path(ex.image).exists()]
+    if missing:
+        sys.exit(f"{len(missing)}/{len(examples)} images not found.")
     bad = 0
     for ex in examples:
         w, h = Image.open(ex.image).size
