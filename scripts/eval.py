@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import sys
 import time
 from pathlib import Path
@@ -34,8 +35,10 @@ def main():
     ap.add_argument("--adapter", default=None)
     ap.add_argument("--limit", type=int, default=None, help="evaluate the first N examples only")
     ap.add_argument("--out", default="runs")
+    ap.add_argument("--seed", default=0)
     args = ap.parse_args()
 
+    set_seed(args.seed)
     data_path = Path(args.data)
     examples = load_jsonl(data_path)[: args.limit]
     model = load_model(
@@ -78,7 +81,20 @@ def main():
     print_report(summary)
     print(f"\nSaved to {run_dir}/")
 
-
+def set_seed(seed: int) -> None:
+    """Seed every RNG we use."""
+    random.seed(seed)
+    # Below are optional on local envs.
+    try:
+        import numpy as np
+        np.random.seed(seed)
+    except:
+        pass
+    try:
+        import torch
+        torch.manual_seed(seed)
+    except:
+        pass
 def print_report(s: dict) -> None:
     o = s["overall"]
     print(f"\n{s['model']} on {s['data']}")
