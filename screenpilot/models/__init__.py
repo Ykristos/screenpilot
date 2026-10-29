@@ -14,4 +14,8 @@ def load_model(name: str, **kwargs) -> GroundingModel:
         from .qwen_vl import QwenVL  # imported lazily so tests don't need torch
 
         return QwenVL(**kwargs)
+    if name.startswith("deepseek"):
+            from .deepseek_vl import DeepSeekVL  # imported lazily so tests don't need torch
+    
+            return DeepSeekVL(**kwargs)
     raise ValueError(f"unknown model {name!r}")
