@@ -1,0 +1,66 @@
+{
+  "overall": {
+    "n": 50,
+    "acc": 0.78,
+    "ci95": [
+      0.6476,
+      0.8725
+    ]
+  },
+  "outcomes": {
+    "correct": 39,
+    "wrong_element": 8,
+    "near_miss": 2,
+    "no_parseable_answer": 1
+  },
+  "platform": {
+    "desktop": {
+      "n": 50,
+      "acc": 0.78,
+      "ci95": [
+        0.6476,
+        0.8725
+      ]
+    }
+  },
+  "element_type": {
+    "icon": {
+      "n": 28,
+      "acc": 0.6428571428571429,
+      "ci95": [
+        0.4583,
+        0.7929
+      ]
+    },
+    "text": {
+      "n": 22,
+      "acc": 0.9545454545454546,
+      "ci95": [
+        0.782,
+        0.9919
+      ]
+    }
+  },
+  "platform/element_type": {
+    "desktop/icon": {
+      "n": 28,
+      "acc": 0.6428571428571429,
+      "ci95": [
+        0.4583,
+        0.7929
+      ]
+    },
+    "desktop/text": {
+      "n": 22,
+      "acc": 0.9545454545454546,
+      "ci95": [
+        0.782,
+        0.9919
+      ]
+    }
+  },
+  "model": "Qwen2.5-VL-3B-Instruct",
+  "data": "data/screenspot_v2/test.jsonl",
+  "mean_latency_s": 0.5919,
+  "wall_s": 31.1
+}
