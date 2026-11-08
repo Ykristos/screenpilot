@@ -45,7 +45,7 @@ class DeepSeekVL(GroundingModel):
         embeds = self.model.prepare_inputs_embeds(**inputs)
 
         out = self.model.language.generate(
-            input_embeds=embeds,
+            inputs_embeds=embeds,
             attention_mask=inputs.attention_mask,
             pad_token_id=self.tokenizer.eos_token_id,
             bos_token_id=self.tokenizer.bos_token_id,
@@ -54,7 +54,7 @@ class DeepSeekVL(GroundingModel):
             do_sample=False,
             use_cache=True,
         )
-        raw = self.tokenizer.decode(out[0].cpu().tolist, skip_special_tokens=False)
+        raw = self.tokenizer.decode(out[0].cpu().tolist(), skip_special_tokens=False)
         point = parse_point(raw)
         if point is None:
             return raw, None
