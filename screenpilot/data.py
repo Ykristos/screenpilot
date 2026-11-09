@@ -13,6 +13,8 @@ bbox (bounding box) is in pixels of the original image, top-left / bottom-right 
 from __future__ import annotations
 
 import json
+import random
+
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterator
@@ -71,4 +73,49 @@ def iter_screenspot_v2(annotation_dir: str | Path, image_dir: str | Path) -> Ite
                 bbox=(x, y, x + w, y + h),
                 platform=platform,
                 element_type=r.get("data_type", "unknown"),
+            )
+
+
+# Converts one OS-Atlas annotation file (e.g. seeclick_web.json) into Examples.
+# Input records come in two shapes, both handled:
+#   flat:   {"img_filename", "instruction", "bbox", "data_type"?}
+#   nested: {"img_filename", "elements": [{"instruction", "bbox", "data_type"?}, ...]}
+# bbox is [left, top, right, bottom] as 0-1 fractions of the image size per the
+# dataset card; values > 1 are treated as pixels already. Schema is unverified;
+# a KeyError means a field name differs.
+def iter_os_atlas(
+    annotation_file: str | Path,
+    image_dir: str | Path,
+    platform: str,
+    source: str,
+    seed: int = 0,
+    max_per_image: int = 3,
+) -> Iterator[Example]:
+    """Yields examples in a seeded random order, so islice(..., n) is a fair sample
+    and only the images actually used get opened."""
+    from PIL import Image  # header-only read below, so this stays cheap
+ 
+    image_dir = Path(image_dir)
+    records = list(enumerate(json.load(open(annotation_file))))
+    random.Random(seed).shuffle(records)
+    for i, r in records:
+        path = (image_dir / r["img_filename"]).resolve()
+        if not path.exists():
+            continue
+        with Image.open(path) as im:
+            w, h = im.size
+        # cap elements per screenshot so one busy page can't dominate the mix
+        for j, el in enumerate(r.get("elements", [r])[:max_per_image]):
+            x1, y1, x2, y2 = el["bbox"]
+            if max(x1, y1, x2, y2) <= 1.0:
+                x1, x2, y1, y2 = x1 * w, x2 * w, y1 * h, y2 * h
+            if not (0 <= x1 < x2 <= w and 0 <= y1 < y2 <= h):
+                continue  # degenerate or out-of-image box
+            yield Example(
+                id=f"{source}-{i}-{j}",
+                image=str(path),
+                instruction=el["instruction"],
+                bbox=(x1, y1, x2, y2),
+                platform=platform,
+                element_type=el.get("data_type", "unknown"),
             )
