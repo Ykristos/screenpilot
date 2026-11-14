@@ -35,18 +35,19 @@ def main():
 
     examples = []
     for spec in args.source:
-        platform, ann, img_dir = spec.split(":")
+        platform, ann, img_dir, *count = spec.split(":")
+        n = int(count[0]) if count else args.per_source
         source = Path(ann).stem
         got = list(
             islice(
                 iter_os_atlas(ann, img_dir, platform, source, args.seed, args.max_per_image),
-                args.per_source,
+                n,
             )
         )
         if not got:
             sys.exit(f"{source}: 0 examples. Check that {img_dir} directly contains the images.")
-        if len(got) < args.per_source:
-            print(f"WARNING {source}: only {len(got)} of {args.per_source} requested")
+        if len(got) < n:
+            print(f"WARNING {source}: only {len(got)} of {n} requested")
         examples += got
         print(f"{source:<24} {platform:<8} {len(got)} examples")
 
